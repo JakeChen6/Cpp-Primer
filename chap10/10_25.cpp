@@ -1,0 +1,77 @@
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <iostream>
+#include <functional>
+
+using std::vector;
+using std::string;
+using std::stable_sort;
+using std::unique;
+using std::partition;
+using std::for_each;    // map
+using std::bind;
+using std::cout;
+using namespace std::placeholders;
+
+void elimDeups(vector<string> &);
+void print(vector<string> &);
+void biggies(vector<string> &, vector<string>::size_type);
+string make_plural(int, const string &, const string &);
+bool check_size(const string &, string::size_type);
+
+int main()
+{
+    vector<string> words = {"the", "quick", "red", "fox", "jumps",
+                            "over", "the", "slow", "red", "turtle"};
+    biggies(words, 5);
+    return 0;
+}
+
+void elimDeups(vector<string> &words)
+{
+    cout << "before eliminating duplicates: ";
+    print(words);
+    sort(words.begin(), words.end());
+    cout << "after sorting: ";
+    print(words);
+    auto end_unique = unique(words.begin(), words.end());
+    cout << "after the call to unique: ";
+    print(words);
+    words.erase(end_unique, words.end());
+    cout << "after the call to erase";
+    print(words);
+}
+
+void print(vector<string> &words)
+{
+    for (const auto &s : words) // read-only, so const; no need to copy the string, so &.
+        cout << s << " ";
+    cout << "\n";
+}
+
+string make_plural(int count, const string &word, const string &s)
+{
+    return count > 1 ? word + s : word;
+}
+
+void biggies(vector<string> &words, vector<string>::size_type sz)
+{
+    elimDeups(words);
+    stable_sort(words.begin(), words.end(),
+                [] (const string &a, const string &b)
+                   { return a.size() < b.size(); });
+    auto wc = partition(words.begin(), words.end(),
+                        bind(check_size, _1, sz));
+    auto count = wc - words.begin();
+    cout << count << " " << make_plural(count, "word", "s")
+         << " of length " << sz << " or longer" << "\n";
+    for_each(words.begin(), wc,
+             [] (const string &s) { cout << s << " "; });
+    cout << "\n";
+}
+
+bool check_size(const string &s, string::size_type sz)
+{
+    return s.size() >= sz;
+}
