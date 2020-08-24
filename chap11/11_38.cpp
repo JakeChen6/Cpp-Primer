@@ -88,7 +88,7 @@ int main(int argc, char **argv)
     if (!input)                 // check that open succeeded
         throw runtime_error("no input file");
 
-	word_transform(map_file, input);
+    word_transform(map_file, input);
 
     return 0;  // exiting main will automatically close the files
 }
